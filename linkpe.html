@@ -1,100 +1,63 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-	<!-- Primary Meta Tags -->
-	<title>LinkPe | UPI LINK Generator</title>
-	<meta name="title" content="LinkPe | UPI LINK Generator">
-	<meta name="description" content="LinkPe | UPI LINK Generator - https://github.com/PtPrashantTripathi/linkpe">
-	<link rel="fluid-icon" href="https://raw.githubusercontent.com/PtPrashantTripathi/linkpe/main/img/linkpe.png"
-		title="PtPrashantTripathi | LinkPe" />
-	<!-- Open Graph / Facebook -->
-	<meta property="og:type" content="website">
-	<meta property="og:url" content="https://ptprashanttripathi.github.io/linkpe">
-	<meta property="og:title" content="LinkPe | UPI LINK Generator">
-	<meta property="og:description"
-		content="LinkPe | UPI LINK Generator - https://github.com/PtPrashantTripathi/linkpe">
-	<meta property="og:image" content="https://raw.githubusercontent.com/PtPrashantTripathi/linkpe/main/img/linkpe.png">
-	<!-- Twitter -->
-	<meta property="twitter:card" content="summary_large_image">
-	<meta property="twitter:url" content="https://ptprashanttripathi.github.io/linkpe">
-	<meta property="twitter:title" content="LinkPe | UPI LINK Generator">
-	<meta property="twitter:description"
-		content="LinkPe | UPI LINK Generator - https://github.com/PtPrashantTripathi/linkpe">
-	<meta property="twitter:image"
-		content="https://raw.githubusercontent.com/PtPrashantTripathi/linkpe/main/img/linkpe.png">
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="css/main.css">
-	<!--Coded by Pt. Prashant Tripathi @ptprashanttripathi on 14th Oct 2020 -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UPI Link Generator</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+</head>
+<body class="bg-gray-900 flex items-center justify-center min-h-screen text-white p-4">
+  <div class="bg-gray-800 p-6 rounded-2xl shadow-xl w-full max-w-md">
+    <h2 class="text-2xl font-bold text-center mb-4">UPI Payment Link Generator</h2>
+    <form id="upiForm" class="space-y-3">
+      <input type="text" name="pn" placeholder="Your Name (Optional)" class="w-full p-2 rounded bg-gray-700 focus:outline-none">
+      <input type="text" name="pa" placeholder="UPI ID" required class="w-full p-2 rounded bg-gray-700 focus:outline-none">
+      <input type="number" name="am" placeholder="Amount (Optional)" class="w-full p-2 rounded bg-gray-700 focus:outline-none">
+      <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 p-2 rounded transition">Generate Link</button>
+    </form>
 
-<body>
-	<center>
-		<div class="card">
-			<div class="card-content">
-				<a href=""><img src="img/logo.png" height="50"></a>
-				<br>
-				<h4 style="color: #DAE0E2;">Create UPI Payment Request Link </h4>
-				<img src="img/upi.png" height="100">
-				<br>
-				<div id="linkpediv" style="display:none;">
-					<textarea class='text-box' rows="4" cols="30" id='linkpeURL'></textarea>
-					<br><br>
-					<a onclick='copyUpiUrl()' class='btn' id='btn-copy'>Copy Link</a>
-					<a id='whatsapp' class="btn">Share Link</a>
-				</div>
-				<form id="linkpeform">
-					<label style="color: #DAE1E2;">Enter Name:</label><br>
-					<input type="name" name="pn" class="text-box" placeholder="Enter your name (Optional):"><br>
-					<label style="color: #DAE1E2;">Enter Upi Id:</label><br>
-					<input type="email" name="pa" class="text-box" placeholder="Enter UPI Id" required><br>
-					<label style="color: #DAE1E2;">Enter Amount (Optional):</label><br>
-					<input type="number" name="am" class="text-box" placeholder="INR"><br>
-					<button type="submit" class="btn">Submit</button>
-				</form>
-				<br>
-				<p style="color: #555">
-					<b>Developed BY : </b>
-					<a href="https://ptprashanttripathi.github.io" style="color: #999;">Pt. Prashant Tripathi</a>
-				</p>
-			</div>
-		</div>
-	</center>
+    <div id="result" class="mt-5 hidden text-center">
+      <textarea id="upiLink" class="w-full p-2 rounded bg-gray-700 text-sm" rows="3" readonly></textarea>
+      <div id="qrcode" class="flex justify-center my-3"></div>
+      <div class="flex space-x-2 mt-2">
+        <button onclick="copyLink()" class="flex-1 bg-green-500 hover:bg-green-600 p-2 rounded transition">Copy</button>
+        <a id="whatsappShare" class="flex-1 bg-green-700 hover:bg-green-800 p-2 rounded text-center transition" target="_blank">WhatsApp</a>
+      </div>
+    </div>
+  </div>
 
+  <script>
+    const form = document.getElementById('upiForm');
+    const resultDiv = document.getElementById('result');
+    const upiLinkField = document.getElementById('upiLink');
+    const whatsappShare = document.getElementById('whatsappShare');
+    const qrcodeDiv = document.getElementById('qrcode');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const pn = form.pn.value.trim();
+      const pa = form.pa.value.trim();
+      const am = form.am.value.trim();
+
+      let link = `upi://pay?pa=${encodeURIComponent(pa)}&pn=${encodeURIComponent(pn)}&cu=INR`;
+      if (am) link += `&am=${encodeURIComponent(am)}`;
+
+      upiLinkField.value = link;
+      whatsappShare.href = `https://wa.me/?text=${encodeURIComponent('Pay via UPI: ' + link)}`;
+      resultDiv.classList.remove('hidden');
+
+      qrcodeDiv.innerHTML = "";
+      QRCode.toCanvas(document.createElement('canvas'), link, { width: 180 }, function (err, canvas) {
+        if (!err) qrcodeDiv.appendChild(canvas);
+      });
+    });
+
+    function copyLink() {
+      upiLinkField.select();
+      document.execCommand('copy');
+      alert('Link copied to clipboard!');
+    }
+  </script>
 </body>
-<script>
-	const queryString = window.location.search;
-	const urlParams = new URLSearchParams(queryString);
-	const pn = urlParams.get('pn');
-	const pa = urlParams.get('pa');
-	const am = urlParams.get('am');
-	if (pa !== null) {
-		// check prod or dev
-		var linkpeURL = window.location.hostname;
-		if (linkpeURL.includes("localhost")) {
-			console.log("dev");
-			linkpeURL = `${window.location.protocol}//${window.location.hostname}:${window.location.port}/index.html`;
-		} else {
-			linkpeURL = `${window.location.protocol}//${window.location.hostname}/linkpe`;
-		}
-
-		linkpeURL += `?pa=${pa}&pn=${pn}&cu=INR`;
-		if (!isNaN(am) && am !== null && am !== "") {
-			linkpeURL += `&am=${am}`;
-		}
-
-		document.getElementById("linkpeURL").innerHTML = linkpeURL;
-		document.getElementById("whatsapp").href = "https://wa.me/?text=Hi%2C%20You%20can%20pay%20me%20by%20this%20Upi%20Payment%20Link%0A%20" + encodeURIComponent(linkpeURL);
-		document.getElementById("linkpediv").style.display = "block";
-		document.getElementById("linkpeform").style.display = "none";
-	}
-	function copyUpiUrl() {
-		var copylinkpe = document.getElementById("linkpeURL");
-		copylinkpe.select();
-		copylinkpe.setSelectionRange(0, 99999)
-		document.execCommand("copy");
-		document.getElementById("btn-copy").innerHTML = "Copied";
-	}
-</script>
-
 </html>
