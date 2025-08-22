@@ -1,87 +1,45 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-	<!-- Primary Meta Tags -->
-	<title>LinkPe | UPI LINK Generator</title>
-	<meta name="title" content="LinkPe | UPI LINK Generator">
-	<meta name="description" content="LinkPe | UPI LINK Generator - https://github.com/PtPrashantTripathi/linkpe">
-	<link rel="fluid-icon" href="https://raw.githubusercontent.com/PtPrashantTripathi/linkpe/main/img/linkpe.png"
-		title="PtPrashantTripathi | LinkPe" />
-	<!-- Open Graph / Facebook -->
-	<meta property="og:type" content="website">
-	<meta property="og:url" content="https://ptprashanttripathi.github.io/linkpe">
-	<meta property="og:title" content="LinkPe | UPI LINK Generator">
-	<meta property="og:description"
-		content="LinkPe | UPI LINK Generator - https://github.com/PtPrashantTripathi/linkpe">
-	<meta property="og:image" content="https://raw.githubusercontent.com/PtPrashantTripathi/linkpe/main/img/linkpe.png">
-	<!-- Twitter -->
-	<meta property="twitter:card" content="summary_large_image">
-	<meta property="twitter:url" content="https://ptprashanttripathi.github.io/linkpe">
-	<meta property="twitter:title" content="LinkPe | UPI LINK Generator">
-	<meta property="twitter:description"
-		content="LinkPe | UPI LINK Generator - https://github.com/PtPrashantTripathi/linkpe">
-	<meta property="twitter:image"
-		content="https://raw.githubusercontent.com/PtPrashantTripathi/linkpe/main/img/linkpe.png">
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="css/main.css">
-	<!--Coded by Pt. Prashant Tripathi @ptprashanttripathi on 14th Oct 2020 -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UPI Payment Page</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+</head>
+<body class="bg-gray-900 flex items-center justify-center min-h-screen p-4">
+  <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md text-center">
+    <h2 id="name" class="text-xl font-semibold text-gray-800 mb-4"></h2>
+    <div id="qrcode" class="flex justify-center mb-4"></div>
+    <a id="payLink" target="_blank" class="block">
+      <button class="w-full bg-green-500 hover:bg-green-600 text-white p-3 rounded-lg mb-3 transition">
+        Pay Now
+      </button>
+    </a>
+    <a href="linkpe.html?new" class="text-sm text-blue-500 hover:underline">
+      Create your own payment link
+    </a>
+  </div>
 
-<body>
-	<center>
-		<div class="card">
-			<div class="card-content">
-				<a href="linkpe.html?new"><img src="img/logo.png" height="50"></a>
-				<h5 id="name" style="color: #101010;">
-					</h4>
-					<canvas id="qr"></canvas>
-					<div style="margin-top: 2px;">
-						<a id="linkpe">
-							<img src="img/upi.png" height="80">
-							<br>
-							<button class='btn'>Click here to Pay Now</button>
-						</a>
-					</div>
-					<br>
-					<a href="linkpe.html?new" style="color: #777;">Click here to create your own payment link</a>
-					<br>
-					<p style="color: #555">
-						<b>Developed BY : </b>
-						<a href="https://ptprashanttripathi.github.io" style="color: #999;">Pt. Prashant
-							Tripathi</a><img src="https://visitor-badge.vercel.app/page/linkpe?color=Blue" />
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const pn = params.get('pn') || '';
+    const pa = params.get('pa');
 
-					</p>
-			</div>
-		</div>
-	</center>
-	<script src="qrious/qrious.min.js"></script>
-	<script>
-		if (window.location.search.indexOf('pa') > -1) {
-			const queryString = window.location.search;
-			const urlParams = new URLSearchParams(queryString);
-			const pn = urlParams.get('pn');
-			const pa = urlParams.get('pa');
-			var user;
-			if (pn !== "") user = pn;
-			else user = pa;
-			const url = 'upi://pay' + queryString;
-			document.getElementById("name").innerHTML = "Click on PayNow or Scan Qr and Pay using any UPI Apps To Pay <br>" + user;
-			document.getElementById("linkpe").href = url;
-			(function () {
-				var qr = new QRious({
-					element: document.getElementById('qr'),
-					background: '#fff',
-					foreground: '#000',
-					size: 200,
-					level: 'H',
-					value: url
-				});
-			})();
-		} else {
-			location.replace("linkpe.html?error");
-		}
-	</script>
+    if (!pa) {
+      window.location.replace("linkpe.html?error");
+    } else {
+      const name = pn || pa;
+      const upiUrl = 'upi://pay?' + params.toString();
+
+      document.getElementById("name").innerHTML = 
+        `Scan QR or Click below to Pay <br><span class="font-bold">${name}</span>`;
+      document.getElementById("payLink").href = upiUrl;
+
+      QRCode.toCanvas(document.createElement('canvas'), upiUrl, { width: 200 }, (err, canvas) => {
+        if (!err) document.getElementById("qrcode").appendChild(canvas);
+      });
+    }
+  </script>
 </body>
-
 </html>
